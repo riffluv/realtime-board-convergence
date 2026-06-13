@@ -6,4 +6,9 @@ Planned initial public release.
 
 - Package scaffold
 - Core board order model
-- Architecture and public boundary documentation
+- Drop resolver
+- Pending operation registry
+- Optimistic projection and convergence checks
+- Operation scheduler
+- Deterministic 4-client and 8-client simulations
+- Architecture, simulation, roadmap, and public boundary documentation

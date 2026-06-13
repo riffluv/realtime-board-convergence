@@ -21,8 +21,95 @@ demo. Bring your own UI and server snapshot source.
 
 ## Status
 
-`0.1.0` is planned as a small pre-1.0 core. APIs may change while the
-simulation model and public boundaries are finalized.
+Pre-1.0. The core modules are implemented and covered by unit tests plus
+deterministic 4-client and 8-client simulations. APIs may change while the
+public package boundary is finalized.
+
+## Install
+
+```bash
+pnpm add @riffluv/realtime-board-convergence
+```
+
+The package is framework-agnostic and ships ESM plus TypeScript declarations.
+
+## Core Modules
+
+- `applyBoardOperation` applies add/move/remove operations to sparse board
+  orders.
+- `resolveDrop` converts UI drop targets into deterministic operation intent.
+- `pendingOperationRegistryReducer` tracks queued, sent, confirmed, rejected,
+  superseded, and resync-required operations.
+- `projectOptimisticOrder` replays active pending operations over an
+  authoritative snapshot for immediate local feedback.
+- `checkOperationConvergence` decides whether an acknowledged operation is
+  actually represented by a trusted snapshot.
+- `createBoardOperationScheduler` serializes local operations and coalesces
+  repeated moves for the same entity.
+- `runSimulation` exercises the model with deterministic virtual clients and
+  an in-memory authoritative server.
+
+## Example
+
+```ts
+import {
+  applyBoardOperation,
+  createBoardOperationScheduler,
+  runSimulation,
+} from "@riffluv/realtime-board-convergence";
+
+const result = applyBoardOperation(["card-a", null], {
+  operationId: "op-1",
+  entityId: "card-b",
+  action: "add",
+  targetIndex: 1,
+});
+
+console.log(result.order); // ["card-a", "card-b"]
+
+const scheduler = createBoardOperationScheduler({
+  execute: async (operation) => ({
+    status: "applied",
+    applied: true,
+    operationId: operation.operationId,
+    order: result.order,
+    revision: 1,
+  }),
+});
+
+await scheduler.enqueue({
+  operationId: "op-2",
+  entityId: "card-a",
+  action: "move",
+  targetIndex: 1,
+});
+
+const report = runSimulation({
+  seed: 20260613,
+  clientCount: 8,
+  entityCount: 12,
+  operationCount: 300,
+  capacity: 12,
+  contention: true,
+});
+
+console.log(report.divergence, report.stuckPending); // 0 0
+```
+
+## Validation
+
+```bash
+pnpm install
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm test:sim
+pnpm build
+```
+
+The simulation tests intentionally include stale snapshot delivery and
+same-target contention so consumers can inspect convergence behavior without a
+hosted backend.
 
 ## Non-Goals
 
@@ -34,26 +121,12 @@ simulation model and public boundaries are finalized.
 
 For details, see [docs/non-goals-and-ip-boundary.md](docs/non-goals-and-ip-boundary.md).
 
-## Planned Core Concepts
+## Docs
 
-- `BoardOrder`
-- `DragIntent`
-- `DropResolution`
-- `PendingOperation`
-- `OptimisticProjection`
-- `BoardOperationScheduler`
-- `ConvergenceResult`
-- `TraceEvent`
-
-## Planned Commands
-
-```bash
-pnpm install
-pnpm typecheck
-pnpm test
-pnpm test:sim
-pnpm build
-```
+- [Architecture](docs/architecture.md)
+- [Simulation report](docs/simulation-report.md)
+- [Roadmap](docs/roadmap.md)
+- [Non-goals and public boundary](docs/non-goals-and-ip-boundary.md)
 
 ## License
 
