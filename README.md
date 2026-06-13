@@ -128,7 +128,10 @@ pnpm typecheck
 pnpm lint
 pnpm test
 pnpm test:sim
+pnpm examples:basic
+pnpm examples:scheduler
 pnpm build
+pnpm packcheck
 ```
 
 The simulation tests intentionally include stale snapshot delivery and
