@@ -31,7 +31,9 @@ function ackedOperation() {
       order: ["a"],
     },
   });
-  return acked.operations["op-1"]!;
+  const operation = acked.operations["op-1"];
+  if (!operation) throw new Error("expected operation");
+  return operation;
 }
 
 describe("convergence checker", () => {

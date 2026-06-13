@@ -53,6 +53,10 @@ export function checkOperationConvergence(input: {
     return { converged: false, reason: "signature-mismatch" };
   }
 
+  if (operation.authoritativeStatus === "noop") {
+    return { converged: true };
+  }
+
   if (operation.action === "remove") {
     return snapshot.order.includes(operation.entityId)
       ? { converged: false, reason: "entity-still-present" }

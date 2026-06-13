@@ -197,7 +197,7 @@ function pruneTerminalOperations(
   const maxTerminalAgeMs = Math.max(0, Math.floor(event.maxTerminalAgeMs));
   const terminalIds = state.order.filter((id) => {
     const operation = state.operations[id];
-    return Boolean(operation) && isPendingOperationTerminal(operation!.state);
+    return operation ? isPendingOperationTerminal(operation.state) : false;
   });
   const keepRecent = new Set(
     maxTerminalOperations > 0 ? terminalIds.slice(-maxTerminalOperations) : []
