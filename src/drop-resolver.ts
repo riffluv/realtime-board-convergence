@@ -50,7 +50,9 @@ const DEFAULT_SLOT_ID_PREFIX = "slot-";
 
 function parseSlotIndex(targetId: string, prefix: string): number | null {
   if (!targetId.startsWith(prefix)) return null;
-  const raw = Number.parseInt(targetId.slice(prefix.length), 10);
+  const suffix = targetId.slice(prefix.length);
+  if (!/^\d+$/.test(suffix)) return null;
+  const raw = Number.parseInt(suffix, 10);
   return Number.isFinite(raw) && raw >= 0 ? raw : null;
 }
 
@@ -124,6 +126,7 @@ export function resolveDropDecision(input: DropResolverInput): DropDecision {
     if (requestedSlotIndex === null) return { kind: "noop", reason: "invalid-slot" };
     if (input.targetHasRect === false) return { kind: "noop", reason: "unhandled" };
     const slotCount = normalizeSlotCount(input.slotCount);
+    if (slotCount <= 0) return { kind: "noop", reason: "invalid-slot" };
     const maxSlot = Math.max(0, slotCount - 1);
     const slotIndex = Math.min(requestedSlotIndex, maxSlot);
     const existingIndex = boardOrder.indexOf(input.entityId);

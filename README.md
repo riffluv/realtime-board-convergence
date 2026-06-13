@@ -1,5 +1,7 @@
 # realtime-board-convergence
 
+[![CI](https://github.com/riffluv/realtime-board-convergence/actions/workflows/ci.yml/badge.svg)](https://github.com/riffluv/realtime-board-convergence/actions/workflows/ci.yml)
+
 Pure TypeScript primitives for optimistic realtime drag/drop boards that
 converge to server-authoritative snapshots.
 
@@ -32,6 +34,9 @@ git clone https://github.com/riffluv/realtime-board-convergence.git
 cd realtime-board-convergence
 pnpm install
 pnpm test
+pnpm test:sim
+pnpm examples:basic
+pnpm examples:scheduler
 ```
 
 The package is framework-agnostic and builds ESM plus TypeScript declarations.
@@ -53,7 +58,22 @@ It is not published to npm yet.
 - `runSimulation` exercises the model with deterministic virtual clients and
   an in-memory authoritative server.
 
-## Example
+## Examples
+
+Source-first examples:
+
+- [examples/source-first-basic.ts](examples/source-first-basic.ts)
+- [examples/scheduler-with-fake-server.ts](examples/scheduler-with-fake-server.ts)
+
+Run them locally:
+
+```bash
+pnpm examples:basic
+pnpm examples:scheduler
+```
+
+After npm publication, package consumers will import the same primitives from
+the package name:
 
 ```ts
 import {
@@ -128,6 +148,7 @@ For details, see [docs/non-goals-and-ip-boundary.md](docs/non-goals-and-ip-bound
 ## Docs
 
 - [Architecture](docs/architecture.md)
+- [API reference](docs/api.md)
 - [Simulation report](docs/simulation-report.md)
 - [Roadmap](docs/roadmap.md)
 - [Non-goals and public boundary](docs/non-goals-and-ip-boundary.md)

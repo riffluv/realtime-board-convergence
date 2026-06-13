@@ -37,6 +37,33 @@ function ackedOperation() {
 }
 
 describe("convergence checker", () => {
+  test("blocks sent operations that have not been acknowledged", () => {
+    const queued = pendingOperationRegistryReducer(EMPTY_PENDING_OPERATION_REGISTRY, {
+      type: "enqueue",
+      at: 10,
+      operation: {
+        operationId: "op-1",
+        entityId: "a",
+        action: "add",
+        targetIndex: 0,
+      },
+    });
+    const sent = pendingOperationRegistryReducer(queued, {
+      type: "sent",
+      at: 20,
+      operationId: "op-1",
+    });
+    const operation = sent.operations["op-1"];
+    if (!operation) throw new Error("expected operation");
+
+    expect(
+      checkOperationConvergence({
+        operation,
+        snapshot: { revision: 1, order: ["a"], trusted: true },
+      })
+    ).toEqual({ converged: false, reason: "operation-not-acked" });
+  });
+
   test("accepts a trusted snapshot at or after the authoritative revision", () => {
     expect(
       checkOperationConvergence({

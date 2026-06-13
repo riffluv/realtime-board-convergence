@@ -105,6 +105,16 @@ describe("pending operation registry", () => {
     ]);
   });
 
+  test("does not treat sent operations as snapshot convergence candidates before ack", () => {
+    const sent = pendingOperationRegistryReducer(enqueue(), {
+      type: "sent",
+      at: 20,
+      operationId: "op-1",
+    });
+
+    expect(selectSnapshotConvergenceCandidateOperations(sent)).toEqual([]);
+  });
+
   test("classifies duplicate and stale authoritative results as superseded", () => {
     const duplicate = pendingOperationRegistryReducer(enqueue(), {
       type: "authoritative-result",

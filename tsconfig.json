@@ -13,5 +13,5 @@
     "exactOptionalPropertyTypes": true,
     "types": ["vitest/globals"]
   },
-  "include": ["src", "test", "vitest.config.ts", "eslint.config.mjs"]
+  "include": ["src", "test", "examples", "vitest.config.ts", "eslint.config.mjs"]
 }

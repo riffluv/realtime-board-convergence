@@ -5,6 +5,18 @@
   "type": "module",
   "sideEffects": false,
   "license": "MIT",
+  "packageManager": "pnpm@10.7.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riffluv/realtime-board-convergence.git"
+  },
+  "bugs": {
+    "url": "https://github.com/riffluv/realtime-board-convergence/issues"
+  },
+  "homepage": "https://github.com/riffluv/realtime-board-convergence#readme",
   "keywords": [
     "collaborative",
     "realtime",
@@ -25,6 +37,7 @@
   "files": [
     "dist",
     "docs",
+    "examples",
     "README.md",
     "LICENSE"
   ],
@@ -34,11 +47,14 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:sim": "vitest run test/simulation-*.test.ts",
+    "examples:basic": "tsx examples/source-first-basic.ts",
+    "examples:scheduler": "tsx examples/scheduler-with-fake-server.ts",
     "packcheck": "pnpm build && pnpm pack"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
     "eslint": "^9.29.0",
+    "tsx": "^4.22.4",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.0",

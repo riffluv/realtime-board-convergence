@@ -25,6 +25,25 @@ describe("drop resolver", () => {
     });
   });
 
+  test("ignores malformed slot targets", () => {
+    expect(
+      resolveDropDecision({
+        ...base,
+        targetId: "slot-1abc",
+      })
+    ).toEqual({ kind: "noop", reason: "invalid-slot" });
+  });
+
+  test("does not resolve slot targets when there are no addressable slots", () => {
+    expect(
+      resolveDropDecision({
+        ...base,
+        targetId: "slot-0",
+        slotCount: 0,
+      })
+    ).toEqual({ kind: "noop", reason: "invalid-slot" });
+  });
+
   test("returns move intent for an entity already on the board", () => {
     expect(
       resolveDrop({

@@ -12,3 +12,4 @@ Planned initial public release.
 - Operation scheduler
 - Deterministic 4-client and 8-client simulations
 - Architecture, simulation, roadmap, and public boundary documentation
+- Source-first examples and API reference

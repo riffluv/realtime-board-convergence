@@ -20,7 +20,7 @@ export type TrustedBoardSnapshot = BoardSnapshot & {
 };
 
 function hasAck(operation: PendingOperation): boolean {
-  return operation.ackAt !== null || operation.state === "sent";
+  return operation.ackAt !== null;
 }
 
 function snapshotRevisionIsCurrent(operation: PendingOperation, snapshot: TrustedBoardSnapshot): boolean {

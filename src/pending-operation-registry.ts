@@ -349,7 +349,5 @@ export function selectActivePendingOperations(
 export function selectSnapshotConvergenceCandidateOperations(
   state: PendingOperationRegistryState
 ): PendingOperation[] {
-  return selectActivePendingOperations(state).filter(
-    (operation) => operation.state === "sent" || operation.ackAt !== null
-  );
+  return selectActivePendingOperations(state).filter((operation) => operation.ackAt !== null);
 }
