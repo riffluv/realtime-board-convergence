@@ -25,13 +25,17 @@ Pre-1.0. The core modules are implemented and covered by unit tests plus
 deterministic 4-client and 8-client simulations. APIs may change while the
 public package boundary is finalized.
 
-## Install
+## Use From Source
 
 ```bash
-pnpm add @riffluv/realtime-board-convergence
+git clone https://github.com/riffluv/realtime-board-convergence.git
+cd realtime-board-convergence
+pnpm install
+pnpm test
 ```
 
-The package is framework-agnostic and ships ESM plus TypeScript declarations.
+The package is framework-agnostic and builds ESM plus TypeScript declarations.
+It is not published to npm yet.
 
 ## Core Modules
 
