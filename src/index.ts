@@ -4,5 +4,5 @@ export * from "./drop-resolver";
 export * from "./pending-operation-registry";
 export * from "./optimistic-projection";
 export * from "./convergence-checker";
-export * from "./proposal-scheduler";
+export * from "./operation-scheduler";
 export * from "./simulation";

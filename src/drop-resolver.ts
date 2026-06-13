@@ -1,4 +1,4 @@
-import type { BoardOperationAction, BoardOrder, EntityId } from "./model";
+import type { BoardOperationAction, EntityId } from "./model";
 
 export type BoardBounds = {
   left: number;

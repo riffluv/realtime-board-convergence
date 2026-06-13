@@ -26,5 +26,5 @@ convergence checker
 ```
 
 The package does not decide how snapshots are delivered. A consuming
-application can use HTTP, WebSocket, WebRTC, Firestore, a custom backend, or
-an in-memory simulation.
+application can use HTTP, WebSocket, WebRTC, a managed document store, a custom
+backend, or an in-memory simulation.

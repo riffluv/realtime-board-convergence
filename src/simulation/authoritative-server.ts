@@ -9,7 +9,7 @@ import type { AuthoritativeOperationResult } from "../pending-operation-registry
 export class AuthoritativeServer {
   private revision = 0;
   private order: BoardSnapshot["order"];
-  private readonly options?: BoardOperationOptions;
+  private readonly options: BoardOperationOptions | undefined;
 
   constructor(input: { order?: BoardSnapshot["order"]; options?: BoardOperationOptions } = {}) {
     this.order = input.order ?? [];

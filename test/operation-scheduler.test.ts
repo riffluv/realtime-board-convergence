@@ -1,6 +1,6 @@
 import { createBoardOperationScheduler } from "../src/index";
 
-describe("board operation scheduler", () => {
+describe("operation scheduler", () => {
   test("executes operations in queue order", async () => {
     const seen: string[] = [];
     const scheduler = createBoardOperationScheduler({

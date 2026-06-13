@@ -1,4 +1,8 @@
-import { applyBoardOperation, type BoardOperationOptions } from "./board-operation";
+import {
+  applyBoardOperation,
+  normalizeBoardOrder,
+  type BoardOperationOptions,
+} from "./board-operation";
 import type { BoardOrder } from "./model";
 import {
   isPendingOperationTerminal,
@@ -33,7 +37,7 @@ export function selectProjectablePendingOperations(
     .map((id) => registry.operations[id])
     .filter(
       (operation): operation is PendingOperation =>
-        Boolean(operation) &&
+        operation !== undefined &&
         !isPendingOperationTerminal(operation.state) &&
         PROJECTABLE_STATES.has(operation.state)
     );
@@ -44,7 +48,7 @@ export function projectOptimisticOrder(input: {
   registry: PendingOperationRegistryState;
   options?: BoardOperationOptions;
 }): OptimisticProjectionResult {
-  let order = input.baseOrder;
+  let order = normalizeBoardOrder(input.baseOrder, input.options);
   const appliedOperationIds: string[] = [];
   const skippedOperationIds: string[] = [];
   const warnings: OptimisticProjectionWarning[] = [];

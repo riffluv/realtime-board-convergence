@@ -342,7 +342,7 @@ export function selectActivePendingOperations(
   return state.order
     .map((id) => state.operations[id])
     .filter((operation): operation is PendingOperation =>
-      Boolean(operation) && !isPendingOperationTerminal(operation.state)
+      operation !== undefined && !isPendingOperationTerminal(operation.state)
     );
 }
 
