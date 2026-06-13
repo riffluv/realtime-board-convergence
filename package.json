@@ -1,0 +1,46 @@
+{
+  "name": "@riffluv/realtime-board-convergence",
+  "version": "0.0.0",
+  "description": "Pure TypeScript primitives for optimistic realtime drag/drop boards that converge to server-authoritative snapshots.",
+  "type": "module",
+  "sideEffects": false,
+  "license": "MIT",
+  "keywords": [
+    "collaborative",
+    "realtime",
+    "drag-and-drop",
+    "optimistic-ui",
+    "server-authoritative",
+    "typescript",
+    "whiteboard",
+    "kanban",
+    "board-games"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:sim": "vitest run test/simulation-*.test.ts",
+    "packcheck": "pnpm build && pnpm pack"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "eslint": "^9.29.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.0",
+    "vitest": "^3.2.4"
+  }
+}
