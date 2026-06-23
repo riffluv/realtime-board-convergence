@@ -12,10 +12,16 @@ This package is intentionally small. Changes should keep the core:
 Before opening a pull request, run:
 
 ```bash
+pnpm install --frozen-lockfile
 pnpm typecheck
 pnpm lint
 pnpm test
+pnpm test:sim
+pnpm examples:basic
+pnpm examples:scheduler
+pnpm examples:convergence
 pnpm build
+pnpm packcheck
 ```
 
 Please include a minimal reproduction for convergence bugs.

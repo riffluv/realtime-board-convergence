@@ -24,8 +24,6 @@
     "optimistic-ui",
     "server-authoritative",
     "typescript",
-    "whiteboard",
-    "kanban",
     "collaborative-board",
     "board-state",
     "realtime-board"
@@ -39,7 +37,6 @@
   "files": [
     "dist",
     "docs",
-    "examples",
     "README.md",
     "LICENSE"
   ],
@@ -51,6 +48,7 @@
     "test:sim": "vitest run test/simulation-*.test.ts",
     "examples:basic": "tsx examples/source-first-basic.ts",
     "examples:scheduler": "tsx examples/scheduler-with-fake-server.ts",
+    "examples:convergence": "tsx examples/ack-snapshot-convergence.ts",
     "packcheck": "pnpm build && pnpm pack"
   },
   "devDependencies": {

@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.1.0
+## Unreleased
 
-Planned initial public release.
+Initial public release work in progress.
 
 - Package scaffold
 - Core board order model
@@ -13,3 +13,4 @@ Planned initial public release.
 - Deterministic 4-client and 8-client simulations
 - Architecture, simulation, roadmap, and public boundary documentation
 - Source-first examples and API reference
+- Trusted-snapshot convergence evidence and skipped-snapshot coverage example

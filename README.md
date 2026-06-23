@@ -2,8 +2,29 @@
 
 [![CI](https://github.com/riffluv/realtime-board-convergence/actions/workflows/ci.yml/badge.svg)](https://github.com/riffluv/realtime-board-convergence/actions/workflows/ci.yml)
 
-Pure TypeScript primitives for optimistic realtime drag/drop boards that
-converge to server-authoritative snapshots.
+Headless TypeScript primitives for optimistic drag/drop on
+server-authoritative ordered boards.
+
+> Core invariant: local operations may be projected immediately, but pending
+> state is retired only after trusted authoritative evidence covers the
+> operation.
+
+```text
+UI input
+  -> deterministic operation intent
+  -> pending-operation registry
+  -> optimistic projection
+  -> serialized executor
+  -> acknowledgement + authoritative revision
+  -> trusted snapshot
+  -> confirm, supersede, reject, or resync
+```
+
+Try the full lifecycle:
+
+```bash
+pnpm examples:convergence
+```
 
 ## Why This Exists
 
@@ -40,7 +61,7 @@ pnpm examples:scheduler
 ```
 
 The package is framework-agnostic and builds ESM plus TypeScript declarations.
-It is not published to npm yet.
+Source-first pre-release. No npm package is available yet.
 
 ## Core Modules
 
@@ -64,12 +85,14 @@ Source-first examples:
 
 - [examples/source-first-basic.ts](examples/source-first-basic.ts)
 - [examples/scheduler-with-fake-server.ts](examples/scheduler-with-fake-server.ts)
+- [examples/ack-snapshot-convergence.ts](examples/ack-snapshot-convergence.ts)
 
 Run them locally:
 
 ```bash
 pnpm examples:basic
 pnpm examples:scheduler
+pnpm examples:convergence
 ```
 
 After npm publication, package consumers will import the same primitives from
@@ -138,6 +161,17 @@ The simulation tests intentionally include stale snapshot delivery and
 same-target contention so consumers can inspect convergence behavior without a
 hosted backend.
 
+The convergence example shows the stricter lifecycle:
+
+```text
+1 enqueue + project
+2 acknowledged, still pending
+3 stale trusted snapshot is ignored
+4 untrusted current snapshot is ignored
+5 later trusted revision covers the operation
+6 terminal registry state
+```
+
 ## Non-Goals
 
 - No browser framework dependency
@@ -146,7 +180,7 @@ hosted backend.
 - No game rules or application-specific UX
 - No CRDT replacement
 
-For details, see [docs/non-goals-and-ip-boundary.md](docs/non-goals-and-ip-boundary.md).
+For details, see [docs/scope-and-non-goals.md](docs/scope-and-non-goals.md).
 
 ## Docs
 
@@ -154,7 +188,7 @@ For details, see [docs/non-goals-and-ip-boundary.md](docs/non-goals-and-ip-bound
 - [API reference](docs/api.md)
 - [Simulation report](docs/simulation-report.md)
 - [Roadmap](docs/roadmap.md)
-- [Non-goals and public boundary](docs/non-goals-and-ip-boundary.md)
+- [Scope and non-goals](docs/scope-and-non-goals.md)
 
 ## License
 

@@ -19,7 +19,10 @@ pending operation registry --> optimistic projection
 operation scheduler
         |
         v
-authoritative snapshot
+acknowledgement + authoritative revision
+        |
+        v
+trusted authoritative snapshot
         |
         v
 convergence checker
@@ -33,6 +36,12 @@ backend, or an in-memory simulation.
 
 - The UI may project local feedback immediately, but convergence is decided
   only from acknowledged operations plus trusted authoritative snapshots.
+- Acknowledgement is not terminal evidence. It records the server result and
+  authoritative revision, then the operation remains pending until trusted
+  snapshot evidence covers it.
+- A trusted snapshot revision is treated as a server-history watermark in the
+  default convergence mode. This lets consumers skip an intermediate exact
+  snapshot without leaving a valid operation pending forever.
 - Drop resolution is deterministic. A visual target, actual target, and
   animation target can be tracked separately so consumers can avoid "looks
   dropped here, actually committed there" drift.

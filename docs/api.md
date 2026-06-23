@@ -25,6 +25,10 @@ type BoardSnapshot = {
 };
 ```
 
+When a snapshot is used as convergence evidence, callers must mark it as
+trusted. A trusted snapshot should represent server-confirmed state, not local
+cache, local writes, or speculative projection.
+
 ## Board Operations
 
 ### `applyBoardOperation(order, operation, options?)`
@@ -137,17 +141,31 @@ operation IDs, and warnings.
 
 ## Convergence Check
 
-### `checkOperationConvergence({ operation, snapshot })`
+### `checkOperationConvergence({ operation, snapshot, evidenceMode? })`
 
 Checks whether an acknowledged operation is represented by a trusted snapshot.
+Acknowledgement alone does not confirm convergence; it only makes the operation
+eligible for snapshot evidence.
 
 The operation is blocked when:
 
 - it has not been acknowledged
-- the snapshot is explicitly untrusted
+- the snapshot is not explicitly trusted
 - the snapshot revision is behind the authoritative result
-- the snapshot signature differs from the authoritative result
+- the snapshot signature differs from the authoritative result in `exact-state`
+  mode
 - the target entity is missing, still present after remove, or in the wrong slot
+
+The default `revision-watermark` mode treats a later trusted authoritative
+revision as evidence that the server history has covered the acknowledged
+operation, even if an intermediate exact snapshot was skipped.
+
+Successful results include an evidence reason:
+
+- `exact-signature`
+- `revision-covered`
+- `operation-effect`
+- `noop-acknowledged`
 
 ## Operation Scheduler
 
