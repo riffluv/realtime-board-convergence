@@ -296,12 +296,16 @@ export function pendingOperationRegistryReducer(
         };
       });
     case "snapshot-matched":
-      return updateOperation(state, operationId, (operation) => ({
-        ...operation,
-        state: "confirmed",
-        snapshotReconciledAt: event.at,
-        updatedAt: event.at,
-      }));
+      return updateOperation(state, operationId, (operation) =>
+        operation.ackAt === null
+          ? operation
+          : {
+              ...operation,
+              state: "confirmed",
+              snapshotReconciledAt: event.at,
+              updatedAt: event.at,
+            }
+      );
     case "rollback":
       return updateOperation(state, operationId, (operation) => ({
         ...operation,

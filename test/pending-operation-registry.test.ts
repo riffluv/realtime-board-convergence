@@ -115,6 +115,23 @@ describe("pending operation registry", () => {
     expect(selectSnapshotConvergenceCandidateOperations(sent)).toEqual([]);
   });
 
+  test("does not confirm an operation from snapshot-matched before ack", () => {
+    const sent = pendingOperationRegistryReducer(enqueue(), {
+      type: "sent",
+      at: 20,
+      operationId: "op-1",
+    });
+    const matched = pendingOperationRegistryReducer(sent, {
+      type: "snapshot-matched",
+      at: 30,
+      operationId: "op-1",
+    });
+
+    expect(matched).toBe(sent);
+    expect(matched.operations["op-1"]?.state).toBe("sent");
+    expect(matched.operations["op-1"]?.snapshotReconciledAt).toBeNull();
+  });
+
   test("classifies duplicate and stale authoritative results as superseded", () => {
     const duplicate = pendingOperationRegistryReducer(enqueue(), {
       type: "authoritative-result",
@@ -153,9 +170,20 @@ describe("pending operation registry", () => {
         targetIndex: 1,
       },
     });
-    const confirmed = pendingOperationRegistryReducer(second, {
-      type: "snapshot-matched",
+    const acked = pendingOperationRegistryReducer(second, {
+      type: "authoritative-result",
       at: 20,
+      operationId: "op-1",
+      result: {
+        status: "applied",
+        applied: true,
+        revision: 1,
+        order: ["a"],
+      },
+    });
+    const confirmed = pendingOperationRegistryReducer(acked, {
+      type: "snapshot-matched",
+      at: 21,
       operationId: "op-1",
     });
     const resync = pendingOperationRegistryReducer(confirmed, {

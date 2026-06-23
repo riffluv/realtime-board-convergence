@@ -40,9 +40,20 @@ describe("optimistic projection", () => {
         targetIndex: 1,
       },
     });
-    const confirmed = pendingOperationRegistryReducer(queued, {
-      type: "snapshot-matched",
+    const acked = pendingOperationRegistryReducer(queued, {
+      type: "authoritative-result",
       at: 20,
+      operationId: "op-1",
+      result: {
+        status: "applied",
+        applied: true,
+        revision: 1,
+        order: ["a", "b"],
+      },
+    });
+    const confirmed = pendingOperationRegistryReducer(acked, {
+      type: "snapshot-matched",
+      at: 30,
       operationId: "op-1",
     });
 

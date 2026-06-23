@@ -70,7 +70,16 @@ describe("convergence checker", () => {
         operation: ackedOperation(),
         snapshot: { revision: 5, order: ["a"], trusted: true },
       })
-    ).toEqual({ converged: true });
+    ).toEqual({ converged: true, evidence: "exact-signature" });
+  });
+
+  test("requires explicit trusted snapshot evidence", () => {
+    expect(
+      checkOperationConvergence({
+        operation: ackedOperation(),
+        snapshot: { revision: 5, order: ["a"] },
+      })
+    ).toEqual({ converged: false, reason: "untrusted-snapshot" });
   });
 
   test("blocks stale snapshots", () => {
@@ -82,12 +91,40 @@ describe("convergence checker", () => {
     ).toEqual({ converged: false, reason: "revision-behind" });
   });
 
-  test("blocks mismatched signatures", () => {
+  test("blocks mismatched signatures in exact-state mode", () => {
     expect(
       checkOperationConvergence({
         operation: ackedOperation(),
         snapshot: { revision: 5, order: ["b"], trusted: true },
+        evidenceMode: "exact-state",
       })
     ).toEqual({ converged: false, reason: "signature-mismatch" });
+  });
+
+  test("covers a skipped exact snapshot with a later trusted revision", () => {
+    expect(
+      checkOperationConvergence({
+        operation: ackedOperation(),
+        snapshot: { revision: 6, order: ["a", "b"], trusted: true },
+      })
+    ).toEqual({ converged: true, evidence: "revision-covered" });
+  });
+
+  test("uses operation-effect evidence for a same-revision board that still contains the operation effect", () => {
+    expect(
+      checkOperationConvergence({
+        operation: ackedOperation(),
+        snapshot: { revision: 5, order: ["a", "b"], trusted: true },
+      })
+    ).toEqual({ converged: true, evidence: "operation-effect" });
+  });
+
+  test("allows a later authoritative revision to supersede the current operation effect", () => {
+    expect(
+      checkOperationConvergence({
+        operation: ackedOperation(),
+        snapshot: { revision: 6, order: ["b", "a"], trusted: true },
+      })
+    ).toEqual({ converged: true, evidence: "revision-covered" });
   });
 });
