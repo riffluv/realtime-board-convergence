@@ -10,7 +10,8 @@ Initial public release work in progress.
 - Pending operation registry
 - Optimistic projection and convergence checks
 - Operation scheduler
-- Deterministic 4-client and 8-client simulations
+- Scope/lease operation authority guard
+- Deterministic 4-client, 8-client, and focused adversarial simulations
 - Architecture, simulation, roadmap, and public boundary documentation
 - Source-first examples and API reference
 - Trusted-snapshot convergence evidence and skipped-snapshot coverage example

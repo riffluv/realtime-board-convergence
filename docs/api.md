@@ -93,6 +93,41 @@ The result includes:
 
 Returns only the structured decision without the derived target fields.
 
+## Operation Authority
+
+### `createOperationAuthorityRuntime()`
+
+Creates a small scope/lease guard for local operations. It is useful when a UI
+starts an interaction under one authoritative context, but the context may
+change before the operation is committed.
+
+```ts
+const authority = createOperationAuthorityRuntime();
+const context = { allowed: true, scopeKey: "board-a|revision-4", leaseId: 1 };
+const token = authority.activate(authority.capture(context), context);
+
+if (authority.authorizeAndConsume(token, context)) {
+  // enqueue or execute local operation
+}
+```
+
+The runtime provides:
+
+- `capture(context)`: returns a start fence only when `context.allowed` is true
+- `activate(fence, context)`: turns a matching pending fence into an active
+  token
+- `rebase(token, context)`: updates the token to a newer lease within the same
+  scope
+- `authorizeAndConsume(token, context)`: validates current scope/lease and
+  clears the active token exactly once
+- `revoke(token)`: clears a pending or active token
+- `invalidate()`: clears all tokens by advancing the internal generation
+- `getLease()`: returns the current public lease snapshot
+
+`scopeKey` is consumer-defined, such as `boardId|revision|mode`. `leaseId`
+should change when the consumer's permission source, active snapshot, or
+operation context changes.
+
 ## Pending Operation Registry
 
 ### `pendingOperationRegistryReducer(state, event)`

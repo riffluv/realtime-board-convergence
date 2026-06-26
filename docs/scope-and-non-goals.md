@@ -11,8 +11,8 @@ It does not include:
 - authentication
 - server hosting
 - product-specific game rules
-- application-specific assets or UI
+- product-specific assets or UI
 - CRDT or consensus behavior
 
-The core API is designed so applications can bring their own UI, transport,
+The core API is designed so consumers can bring their own UI, transport,
 server validation, and authoritative snapshot source.

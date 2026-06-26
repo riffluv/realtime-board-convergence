@@ -5,4 +5,5 @@ export * from "./pending-operation-registry";
 export * from "./optimistic-projection";
 export * from "./convergence-checker";
 export * from "./operation-scheduler";
+export * from "./operation-authority";
 export * from "./simulation";

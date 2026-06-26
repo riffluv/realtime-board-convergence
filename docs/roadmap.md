@@ -5,7 +5,7 @@ correctness, testability, and integration clarity.
 
 ## Near Term
 
-- Add more adversarial simulation seeds.
+- Add more long-running adversarial simulation seeds.
 - Add examples for common UI integrations without depending on a framework.
 - Add snapshot diff helpers for diagnostics.
 - Add typed trace event helpers for consumers that want structured telemetry.

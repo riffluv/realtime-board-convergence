@@ -19,6 +19,7 @@ pnpm test
 pnpm test:sim
 pnpm examples:basic
 pnpm examples:scheduler
+pnpm examples:guard
 pnpm examples:convergence
 pnpm build
 pnpm packcheck

@@ -13,6 +13,9 @@ drag intent
 drop resolver
         |
         v
+operation authority guard
+        |
+        v
 pending operation registry --> optimistic projection
         |
         v
@@ -28,9 +31,9 @@ trusted authoritative snapshot
 convergence checker
 ```
 
-The package does not decide how snapshots are delivered. A consuming
-application can use HTTP, WebSocket, WebRTC, a managed document store, a custom
-backend, or an in-memory simulation.
+The package does not decide how snapshots are delivered. A consumer can use
+HTTP, WebSocket, WebRTC, a managed document store, a custom backend, or an
+in-memory simulation.
 
 ## Design Rules
 
@@ -45,6 +48,9 @@ backend, or an in-memory simulation.
 - Drop resolution is deterministic. A visual target, actual target, and
   animation target can be tracked separately so consumers can avoid "looks
   dropped here, actually committed there" drift.
+- Operation authority is explicit. Consumers can capture a start fence, activate
+  it only for the current scope/lease, and consume it once before enqueueing
+  local work.
 - Pending operations are explicit state, not implicit timers. Terminal states
   are retained long enough for debugging and can be pruned later.
 - Transport and persistence are outside the package. The scheduler accepts an
@@ -59,6 +65,7 @@ backend, or an in-memory simulation.
 | `model` | Shared operation, snapshot, and identifier types |
 | `board-operation` | Sparse board normalization and add/move/remove semantics |
 | `drop-resolver` | UI target to operation-intent decisions |
+| `operation-authority` | Single-use scope/lease guard for local operations |
 | `pending-operation-registry` | Pending operation lifecycle reducer |
 | `optimistic-projection` | Local projection over the latest snapshot |
 | `convergence-checker` | Snapshot-based confirmation checks |

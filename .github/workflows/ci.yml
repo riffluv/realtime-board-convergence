@@ -23,6 +23,7 @@ jobs:
       - run: pnpm test:sim
       - run: pnpm examples:basic
       - run: pnpm examples:scheduler
+      - run: pnpm examples:guard
       - run: pnpm examples:convergence
       - run: pnpm build
       - run: pnpm packcheck

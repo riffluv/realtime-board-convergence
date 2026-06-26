@@ -2,8 +2,15 @@
 
 [![CI](https://github.com/riffluv/realtime-board-convergence/actions/workflows/ci.yml/badge.svg)](https://github.com/riffluv/realtime-board-convergence/actions/workflows/ci.yml)
 
-Headless TypeScript primitives for optimistic drag/drop on
-server-authoritative ordered boards.
+Headless TypeScript primitives for optimistic board drag/drop that converges to
+trusted server snapshots.
+
+`realtime-board-convergence` helps realtime board UIs separate fast local drag
+feedback from server-authoritative state. It provides deterministic drop intent
+resolution, a pending-operation registry, optimistic projection over the latest
+snapshot, serialized operation scheduling, scope/lease authority guards, and
+convergence checks that keep operations pending until trusted snapshot evidence
+covers them.
 
 > Core invariant: local operations may be projected immediately, but pending
 > state is retired only after trusted authoritative evidence covers the
@@ -12,6 +19,7 @@ server-authoritative ordered boards.
 ```text
 UI input
   -> deterministic operation intent
+  -> operation authority guard
   -> pending-operation registry
   -> optimistic projection
   -> serialized executor
@@ -20,33 +28,26 @@ UI input
   -> confirm, supersede, reject, or resync
 ```
 
-Try the full lifecycle:
+## What You Get
+
+- **Project locally, confirm from snapshots**: render optimistic board state
+  immediately, but retire pending operations only after trusted evidence.
+- **Deterministic operation intent**: convert drag/drop targets into add, move,
+  remove, noop, or reject decisions.
+- **Explicit pending lifecycle**: track queued, optimistic, sent, acknowledged,
+  confirmed, rejected, superseded, and resync-required operations.
+- **Scope/lease authority guard**: reject stale local work before it can enqueue
+  an operation.
+- **Framework-agnostic boundary**: no React, DOM, transport, storage, auth,
+  backend, or game-rule dependency.
+- **Deterministic simulations**: seeded 4-client and 8-client convergence
+  scenarios with stale snapshots and contention.
+
+Try the full trusted-snapshot lifecycle:
 
 ```bash
 pnpm examples:convergence
 ```
-
-## Why This Exists
-
-Collaborative board interfaces often need immediate local drag feedback while
-the final board state remains authoritative on a server. This package focuses
-on the coordination layer between those two requirements:
-
-- deterministic drag/drop intent resolution
-- optimistic local projection
-- pending operation lifecycle tracking
-- queueing and coalescing of local operations
-- convergence checks against authoritative snapshots
-- deterministic multi-client simulations
-
-It does not provide rendering, networking, authentication, storage, or a hosted
-demo. Bring your own UI and server snapshot source.
-
-## Status
-
-Pre-1.0. The core modules are implemented and covered by unit tests plus
-deterministic 4-client and 8-client simulations. APIs may change while the
-public package boundary is finalized.
 
 ## Use From Source
 
@@ -58,6 +59,8 @@ pnpm test
 pnpm test:sim
 pnpm examples:basic
 pnpm examples:scheduler
+pnpm examples:guard
+pnpm examples:convergence
 ```
 
 The package is framework-agnostic and builds ESM plus TypeScript declarations.
@@ -68,6 +71,8 @@ Source-first pre-release. No npm package is available yet.
 - `applyBoardOperation` applies add/move/remove operations to sparse board
   orders.
 - `resolveDrop` converts UI drop targets into deterministic operation intent.
+- `createOperationAuthorityRuntime` guards local operations with a single-use
+  scope/lease token.
 - `pendingOperationRegistryReducer` tracks queued, sent, confirmed, rejected,
   superseded, and resync-required operations.
 - `projectOptimisticOrder` replays active pending operations over an
@@ -76,23 +81,36 @@ Source-first pre-release. No npm package is available yet.
   actually represented by a trusted snapshot.
 - `createBoardOperationScheduler` serializes local operations and coalesces
   repeated moves for the same entity.
-- `runSimulation` exercises the model with deterministic virtual clients and
-  an in-memory authoritative server.
+- `runSimulation` exercises the model with deterministic virtual clients and an
+  in-memory authoritative server.
 
 ## Examples
 
 Source-first examples:
 
-- [examples/source-first-basic.ts](examples/source-first-basic.ts)
-- [examples/scheduler-with-fake-server.ts](examples/scheduler-with-fake-server.ts)
-- [examples/ack-snapshot-convergence.ts](examples/ack-snapshot-convergence.ts)
+- [examples/basic-optimistic-projection.ts](examples/basic-optimistic-projection.ts)
+- [examples/serialized-scheduler-fake-server.ts](examples/serialized-scheduler-fake-server.ts)
+- [examples/scoped-operation-guard.ts](examples/scoped-operation-guard.ts)
+- [examples/trusted-snapshot-convergence.ts](examples/trusted-snapshot-convergence.ts)
 
 Run them locally:
 
 ```bash
 pnpm examples:basic
 pnpm examples:scheduler
+pnpm examples:guard
 pnpm examples:convergence
+```
+
+The convergence example shows the stricter lifecycle:
+
+```text
+1 enqueue + project
+2 acknowledged, still pending
+3 stale trusted snapshot is ignored
+4 untrusted current snapshot is ignored
+5 later trusted revision covers the operation
+6 terminal registry state
 ```
 
 After npm publication, package consumers will import the same primitives from
@@ -102,24 +120,30 @@ the package name:
 import {
   applyBoardOperation,
   createBoardOperationScheduler,
+  createOperationAuthorityRuntime,
   runSimulation,
 } from "@riffluv/realtime-board-convergence";
 
-const result = applyBoardOperation(["card-a", null], {
-  operationId: "op-1",
-  entityId: "card-b",
-  action: "add",
-  targetIndex: 1,
-});
+const authority = createOperationAuthorityRuntime();
+const context = { allowed: true, scopeKey: "board-a|revision-1", leaseId: 1 };
+const token = authority.activate(authority.capture(context), context);
 
-console.log(result.order); // ["card-a", "card-b"]
+if (authority.authorizeAndConsume(token, context)) {
+  const result = applyBoardOperation(["card-a", null], {
+    operationId: "op-1",
+    entityId: "card-b",
+    action: "add",
+    targetIndex: 1,
+  });
+
+  console.log(result.order); // ["card-a", "card-b"]
+}
 
 const scheduler = createBoardOperationScheduler({
   execute: async (operation) => ({
     status: "applied",
     applied: true,
     operationId: operation.operationId,
-    order: result.order,
     revision: 1,
   }),
 });
@@ -153,6 +177,8 @@ pnpm test
 pnpm test:sim
 pnpm examples:basic
 pnpm examples:scheduler
+pnpm examples:guard
+pnpm examples:convergence
 pnpm build
 pnpm packcheck
 ```
@@ -161,23 +187,18 @@ The simulation tests intentionally include stale snapshot delivery and
 same-target contention so consumers can inspect convergence behavior without a
 hosted backend.
 
-The convergence example shows the stricter lifecycle:
+## Status
 
-```text
-1 enqueue + project
-2 acknowledged, still pending
-3 stale trusted snapshot is ignored
-4 untrusted current snapshot is ignored
-5 later trusted revision covers the operation
-6 terminal registry state
-```
+Pre-1.0. The core modules are implemented and covered by unit tests plus
+deterministic 4-client and 8-client simulations. APIs may change while the
+public package boundary is finalized.
 
 ## Non-Goals
 
 - No browser framework dependency
 - No database or backend integration
 - No hosted demo
-- No game rules or application-specific UX
+- No game rules or product-specific UX
 - No CRDT replacement
 
 For details, see [docs/scope-and-non-goals.md](docs/scope-and-non-goals.md).
@@ -186,7 +207,7 @@ For details, see [docs/scope-and-non-goals.md](docs/scope-and-non-goals.md).
 
 - [Architecture](docs/architecture.md)
 - [API reference](docs/api.md)
-- [Simulation report](docs/simulation-report.md)
+- [Simulations](docs/simulations.md)
 - [Roadmap](docs/roadmap.md)
 - [Scope and non-goals](docs/scope-and-non-goals.md)
 
